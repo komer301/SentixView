@@ -53,5 +53,4 @@ def analysis(video_id):
 
     sentiment_distribution = round(comments_df['sentiment'].value_counts(normalize=True) * 100)
     sentiment_json = sentiment_distribution.to_json()
-    
     return sentiment_json
