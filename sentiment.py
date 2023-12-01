@@ -18,21 +18,17 @@ def fetch_comments(video_id):
         textFormat="plainText"
     ).execute()
     comments = []
-    comment_count = 0
 
-    while video_response and comment_count < 500:
+    while video_response:
         for item in video_response['items']:
             comment = item['snippet']['topLevelComment']['snippet']['textDisplay'][:500]
             comments.append(comment)
-            comment_count += 1
 
-            if comment_count >= 500:
-                break
-
-        if 'nextPageToken' in video_response and comment_count < 500:
+        if 'nextPageToken' in video_response:
             video_response = youtube.commentThreads().list(
                 part='snippet',
                 videoId=video_id,
+                maxResults=500,
                 textFormat = "plainText",
                 pageToken=video_response['nextPageToken']
             ).execute()
