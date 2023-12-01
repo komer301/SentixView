@@ -13,21 +13,32 @@ def fetch_comments(video_id):
     youtube = build('youtube', 'v3', developerKey=api_key)
     video_response = youtube.commentThreads().list(
         part='snippet',
-        videoId=video_id
+        videoId=video_id,
+        maxResults=500,
+        textFormat="plainText"
     ).execute()
     comments = []
-    while video_response:
+    comment_count = 0
+
+    while video_response and comment_count < 500:
         for item in video_response['items']:
             comment = item['snippet']['topLevelComment']['snippet']['textDisplay'][:500]
             comments.append(comment)
-        if 'nextPageToken' in video_response:
+            comment_count += 1
+
+            if comment_count >= 500:
+                break
+
+        if 'nextPageToken' in video_response and comment_count < 500:
             video_response = youtube.commentThreads().list(
                 part='snippet',
                 videoId=video_id,
+                textFormat = "plainText",
                 pageToken=video_response['nextPageToken']
             ).execute()
         else:
             break
+
     return comments
 
 def analyze_sentiment(comment):
@@ -44,7 +55,7 @@ def analysis(video_id):
         'sentiment': sentiment_labels
     })
 
-    sentiment_distribution = comments_df['sentiment'].value_counts(normalize=True) * 100
+    sentiment_distribution = round(comments_df['sentiment'].value_counts(normalize=True) * 100)
     sentiment_json = sentiment_distribution.to_json()
     
     return sentiment_json
