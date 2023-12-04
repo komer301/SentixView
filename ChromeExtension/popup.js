@@ -1,6 +1,5 @@
 // popup.js
 document.addEventListener("DOMContentLoaded", function () {
-  // Automatically get the video ID from the active tab
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const videoId = extractVideoId(tabs[0].url);
     if (videoId) {
@@ -22,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const apiUrl = "http://127.0.0.1:5000/" + videoId;
     const resultDiv = document.getElementById("result");
 
-    // Display loading spinner or some feedback to the user
     resultDiv.innerHTML = "Analyzing sentiment...";
 
     fetch(apiUrl)
@@ -56,7 +54,6 @@ document.addEventListener("DOMContentLoaded", function () {
     resultDiv.innerHTML = "";
 
     try {
-      // Parse the result string into a JavaScript object
       const parsedResult = JSON.parse(result);
 
       if (parsedResult.error) {
@@ -78,6 +75,4 @@ document.addEventListener("DOMContentLoaded", function () {
     const match = url.match(/[?&]v=([^&]+)/);
     return match ? match[1] : null;
   }
-
-  // ... rest of your code
 });
